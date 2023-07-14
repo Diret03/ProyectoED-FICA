@@ -330,40 +330,54 @@ public class ArbolBinario {
         return PostOrder(raiz);
     }
     
- 
+     /**
+     * Método que ingresa elementos al árbol de forma balanceada a partir de una lista ordenada de Personas
+     * @param lista ArrayList de personas, ordenadas de menor a mayor por su cédula.
+     * @param inicio índice de inicio de la lista.
+     * @param fin índice del final de la lista.
+     * @return NodoAB nodo -> Nodo el cual se retorna pues este se asignará recursivamente en los subárboles izquierdos y derechos
+     */
     public NodoAB IngresarBalanceado(ArrayList<Persona> lista, int inicio, int fin)
     {               
-        if (inicio > fin) {
+        if (inicio > fin) { /*verificación inicial para asegurarse de que el índice de inicio no sea mayor que 
+                            el índice de fin. Si esto ocurre, significa que no hay más elementos para agregar y se devuelve null*/
             return null;
         }        
         
-        int medio = (inicio+fin)/2;
-        Persona valorMedio = lista.get(medio);
+        int medio = (inicio+fin)/2;       //se calcula el índice medio entre el inicio y el fin
+        Persona valorMedio = lista.get(medio);  //el valor correspondiente a la posición media se obtiene de la lista.
+         
+        NodoAB nodo = new NodoAB(valorMedio);  //se crea un nuevo nodo con el valor medio
         
-        NodoAB nodo = new NodoAB(valorMedio);
-        
-        if (raiz == null) {
-            raiz = nodo;
+        if (raiz == null) {   //Si la raíz del árbol aún no ha sido establecida:
+            raiz = nodo;      // se asigna el nodo actual como raíz.
         }
         
-        nodo.setHijoIzq(IngresarBalanceado(lista, inicio, medio-1));
-        nodo.setHijoDer(IngresarBalanceado(lista, medio+1, fin));
         
-     
-        return nodo;
+        /*Llamada recursiva al método utilizando los índices de inicio y medio-1 para construir el subárbol izquierdo. 
+           Estos índices definen una nueva sección de la lista 
+          que incluye todos los elementos desde el inicio hasta el elemento anterior al medio.
+        */
+        nodo.setHijoIzq(IngresarBalanceado(lista, inicio, medio-1)); 
+      
+        /*Llamada recursiva al método utilizando los índices de medio +1 y fin para construir el subárbol derecho. 
+           Estos índices definen una nueva sección de la lista 
+           que incluye todos los elementos desde el elemento siguiente al medio hasta el final de la lista.
+        */
+        nodo.setHijoDer(IngresarBalanceado(lista, medio+1, fin));
+         
+        return nodo; 
         
     }
     
     public NodoAB IngresarBalanceado(ArrayList<Persona> lista)
     {
-        if (lista.isEmpty()) {
-            return null;
-        }
-        
-        return IngresarBalanceado(lista, 0, lista.size()-1);
+        return IngresarBalanceado(lista, 0, lista.size()-1);  //se llama al método anterior, 
+                                                                     //desde la posición inicial 0 hasta la última de la lista
     }
     
    
+    //metodo descartado, no retorna el nivel del arbol en el que la persona fue encontrada
     public Persona BuscarPersona(String cedula)
     {
         NodoAB aux = raiz;
@@ -386,10 +400,49 @@ public class ArbolBinario {
                 else            //si la comparacion es menor, significa que la cedula ingresada es menor al nodo aux actual
                     aux = aux.getHijoIzq();  //aux apunta a su hijo izquierdo
             }
-        }
-        
-        
+        }              
         return personaBuscada;
+    }  
+    
+    /**
+     * Método que busca mediante la cédula a un estudiante almacenado en el árbol 
+     * @param cedula Cedula mediante la cual se buscará al estudiante.
+     * @return Object[] arreglo -> Arreglo cuya primera posición almacena la persona a buscar, 
+     * y la segunda posición almacena el nivel del árbol en que dicha persona fue encontrada.
+     */
+    public Object[] BuscarPersona2(String cedula)  
+    {
+        NodoAB aux = raiz;       //el nodo aux va a recorrer el árbol, empieza en la raíz.
+        Object[] arreglo = new Object[2];     //se crea un arreglo de Object el cual contiene a la persona encontrada y el nivel en el que fue encontrado
+        Persona personaBuscada = null;        //se inicializa a un objeto de Persona, el cual contendrá la persona a buscar
+        int nivel = 1;                        //se inicializa el nivel en 1
+        
+        
+        while (aux != null) {            
+            
+            int r = cedula.compareTo( aux.getInfo().getCedula());  //se realiza comparacion entre cedula y la cedula actual del nodo aux
+            
+            if (r == 0)  //si son iguales..
+            {
+                personaBuscada = aux.getInfo();  //se almacena la persona de aux en la variable personaBuscada
+                break; //se termina el ciclo
+            }
+            else
+            {
+                if (r > 0) {    //si la comparacion es mayor, significa que la cedula ingresada es mayor al nodo aux actual
+                    aux = aux.getHijoDer();   //aux apunta a su hijo derecho
+                } 
+                else {     //si la comparacion es menor, significa que la cedula ingresada es menor al nodo aux actual
+                    aux = aux.getHijoIzq();  //aux apunta a su hijo izquierdo
+                    
+                }
+                nivel++;   //se incrementa el nivel debido a que la persona no fue encontrada en el nivel actual
+            }
+        }        
+        arreglo[0] = personaBuscada;     //se asigna la personaBuscada a la posicion 0 del arreglo   
+        arreglo[1] = nivel;              //se asigna el nivel de la persona en la posicion 1 del arreglo
+        
+        return arreglo;
     }  
      
 

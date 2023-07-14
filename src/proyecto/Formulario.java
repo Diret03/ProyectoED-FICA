@@ -144,18 +144,19 @@ public class Formulario extends javax.swing.JFrame {
         tabla.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "cedula", "nombres", "facultad", "carrera"
+                "cedula", "nombres", "facultad", "carrera", "nivelArbol"
             }
         ));
         jScrollPane1.setViewportView(tabla);
         if (tabla.getColumnModel().getColumnCount() > 0) {
             tabla.getColumnModel().getColumn(1).setPreferredWidth(275);
+            tabla.getColumnModel().getColumn(4).setPreferredWidth(50);
         }
 
         txtArea.setColumns(20);
@@ -192,9 +193,9 @@ public class Formulario extends javax.swing.JFrame {
                         .addGap(28, 28, 28)
                         .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel3)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE)
                     .addComponent(jScrollPane2))
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -202,7 +203,7 @@ public class Formulario extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(65, 65, 65)
                         .addComponent(jLabel2)))
-                .addGap(157, 157, 157))
+                .addGap(180, 180, 180))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -236,9 +237,12 @@ public class Formulario extends javax.swing.JFrame {
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         
     
-//        Persona personaEncontrada = arbol.Buscar(txtCedula.getText());
-        Persona personaEncontrada = arbol.BuscarPersona(txtCedula.getText());
-        if (personaEncontrada == null) {
+        Object[] arreglo = arbol.BuscarPersona2(txtCedula.getText());
+        
+        //Persona personaEncontrada = arbol.BuscarPersona(txtCedula.getText());
+        
+        
+        if (arreglo[0] == null) {  //si el arreglo en la posicion 0 es null, significa que el estudiante no fue encontrado
             JOptionPane.showMessageDialog(null, "Estudiante no encontrado...", "Error", JOptionPane.ERROR_MESSAGE);
         }
         else {
@@ -246,17 +250,22 @@ public class Formulario extends javax.swing.JFrame {
             tableModel = (DefaultTableModel) tabla.getModel();
             
             while (tableModel.getRowCount() > 0) {
-                tableModel.removeRow(0);
+                tableModel.removeRow(0);       //tableModel por defecto añade algunas filas vacias al inicio, entonces se remueven dichas filas vacías
             }
             
-            String[] infoEstudiante = {personaEncontrada.getCedula(), personaEncontrada.getNombres(),
-                personaEncontrada.getFacultad(), personaEncontrada.getCarrera()};
+            String[] infoEstudiante =                  //arreglo de String, el cual almacena el contenido de la fila
+            {
+                ((Persona)(arreglo[0])).getCedula(),   //se recuperan los atributos de la persona encontrada
+                ((Persona)(arreglo[0])).getNombres(),
+                ((Persona)(arreglo[0])).getFacultad(), 
+                ((Persona)(arreglo[0])).getCarrera(),
+                String.valueOf(arreglo[1])            //se convierte a String el nivel, el cual está almecenado en la posición 1 del arreglo
+            };
             
-            tableModel.addRow(infoEstudiante);
+            tableModel.addRow(infoEstudiante);     //se añade una nueva fila con el contenido del arreglo de String infoEstudiante
             tabla.setModel(tableModel);
            
-        }
-        
+        }      
         /*
                 String salida = "Cedula: " + personaEncontrada.getCedula() + "\n"
                     + "Nombres: " + personaEncontrada.getNombres() + "\n"
@@ -264,8 +273,6 @@ public class Formulario extends javax.swing.JFrame {
                     + "Carrera: " + personaEncontrada.getCarrera();
                   txtArea.setText(salida);
         */
-
-
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirActionPerformed
