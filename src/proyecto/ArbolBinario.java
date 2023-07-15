@@ -375,34 +375,74 @@ public class ArbolBinario {
         return IngresarBalanceado(lista, 0, lista.size()-1);  //se llama al método anterior, 
                                                                      //desde la posición inicial 0 hasta la última de la lista
     }
+      
+
+    private int calcularNivel(NodoAB actual, NodoAB nodo) {
+        if (actual == null) {
+            return -1; // Nodo no encontrado, devuelve un valor indicativo (-1 en este caso)
+        }
+
+        if (actual == nodo) {
+            return 0; // Nodo encontrado, devuelve el nivel actual (0 en este caso)
+        }
+
+        // Recursivamente busca en los subárboles izquierdo y derecho
+        int nivelIzquierda = calcularNivel(actual.getHijoIzq(), nodo);
+        int nivelDerecha = calcularNivel(actual.getHijoDer(), nodo);
+
+        // Si el nodo no fue encontrado en ninguno de los subárboles, devuelve -1
+        if (nivelIzquierda == -1 && nivelDerecha == -1) {
+            return -1;
+        }
+
+        // Retorna el nivel encontrado (mayor nivel entre los subárboles) + 1
+        return Math.max(nivelIzquierda, nivelDerecha) + 1;
+    }
     
-   
-    //metodo descartado, no retorna el nivel del arbol en el que la persona fue encontrada
-    public Persona BuscarPersona(String cedula)
+    public int Nivel(NodoAB raiz, NodoAB nodo) {
+        return calcularNivel(raiz, nodo);
+    }
+    
+    
+    public int Profundidad(NodoAB nodo)
     {
+        String cedula = nodo.getInfo().getCedula();
+        boolean encontrado = false;
         NodoAB aux = raiz;
-        Persona personaBuscada = null;
+        int profundidad = 0;
         
-        while (aux != null) {            
+        while (aux != null) 
+        {            
+            int r = cedula.compareTo( aux.getInfo().getCedula());
             
-            int r = cedula.compareTo(((Persona) aux.getInfo()).getCedula());  //se realiza comparacion entre cedula y la cedula actual de aux
-            
-            if (r == 0)  //si son iguales..
+            if (r == 0) 
             {
-                personaBuscada = (Persona)(aux.getInfo());  //se almacena la persona de aux en la variable personaBuscada
-                break; //se termina el ciclo
+                encontrado = true;
+                break;
             }
-            else
+            else 
             {
-                if (r > 0) {    //si la comparacion es mayor, significa que la cedula ingresada es mayor al nodo aux actual
-                    aux = aux.getHijoDer();   //aux apunta a su hijo derecho
+                if (r>0) {                  
+                    aux = aux.getHijoDer();                 
                 }
-                else            //si la comparacion es menor, significa que la cedula ingresada es menor al nodo aux actual
-                    aux = aux.getHijoIzq();  //aux apunta a su hijo izquierdo
+                
+                else
+                {
+                    aux = aux.getHijoIzq();
+                }
+                
+                profundidad++;
             }
-        }              
-        return personaBuscada;
-    }  
+        }
+        
+        if (encontrado) {
+            return profundidad;
+        }
+        return -1;
+        
+
+    }
+    
     
     /**
      * Método que busca mediante la cédula a un estudiante almacenado en el árbol 
@@ -413,9 +453,13 @@ public class ArbolBinario {
     public Object[] BuscarPersona2(String cedula)  
     {
         NodoAB aux = raiz;       //el nodo aux va a recorrer el árbol, empieza en la raíz.
-        Object[] arreglo = new Object[2];     //se crea un arreglo de Object el cual contiene a la persona encontrada y el nivel en el que fue encontrado
+        Object[] arreglo = new Object[6];     //se crea un arreglo de Object el cual contiene a la persona encontrada y el nivel en el que fue encontrado
         Persona personaBuscada = null;        //se inicializa a un objeto de Persona, el cual contendrá la persona a buscar
-        int nivel = 1;                        //se inicializa el nivel en 1
+        int nivel = 0;                        //se inicializa el nivel en 1
+        int numComparaciones = 0;
+        int altura = 0;
+        int tamanio = 0;
+        int profundidad = 0;
         
         
         while (aux != null) {            
@@ -425,6 +469,12 @@ public class ArbolBinario {
             if (r == 0)  //si son iguales..
             {
                 personaBuscada = aux.getInfo();  //se almacena la persona de aux en la variable personaBuscada
+                nivel = Nivel(raiz, aux);
+                numComparaciones = nivel +1;
+                altura = Altura(aux);
+                tamanio = Size(aux);
+                profundidad = Profundidad(aux);
+    
                 break; //se termina el ciclo
             }
             else
@@ -436,11 +486,15 @@ public class ArbolBinario {
                     aux = aux.getHijoIzq();  //aux apunta a su hijo izquierdo
                     
                 }
-                nivel++;   //se incrementa el nivel debido a que la persona no fue encontrada en el nivel actual
+             //se incrementa el nivel debido a que la persona no fue encontrada en el nivel actual
             }
         }        
         arreglo[0] = personaBuscada;     //se asigna la personaBuscada a la posicion 0 del arreglo   
-        arreglo[1] = nivel;              //se asigna el nivel de la persona en la posicion 1 del arreglo
+        arreglo[1] = nivel;              //se asigna el nivel en el que fue encontrado la persona en la posicion 1 del arreglo
+        arreglo[2] = numComparaciones;    //se asigna numero de comparaciones
+        arreglo[3] = altura;             //se asigna la altura del nodo de la persona encontrada en la posicion 3 de arreglo
+        arreglo[4] = tamanio;            //se asigna el tamaño del nodo de la persona encontrada en la posicion 4 de arreglo
+        arreglo[5] = profundidad;
         
         return arreglo;
     }  
